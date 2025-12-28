@@ -1,5 +1,9 @@
 import express from "express";
-import { previewCourses } from "../controllers/courseController";
+import {
+  previewCourses,
+  purchaseCourse,
+} from "../controllers/courseController.js";
 export const courseRoutes = express.Router();
 
 courseRoutes.get("/preview", previewCourses);
+courseRoutes.post("/purchase", purchaseCourse);

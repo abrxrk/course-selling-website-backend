@@ -5,7 +5,7 @@ import {
   removeCourse,
   signup,
   updateCourse,
-} from "../controllers/adminController";
+} from "../controllers/adminController.js";
 export const adminRoutes = express.Router();
 
 adminRoutes.post("/signup", signup);
