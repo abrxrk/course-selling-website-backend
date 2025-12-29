@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import { User } from "../models/UserSchema.js";
 import jwt from "jsonwebtoken";
+import { Purchases } from "../models/PurchaseSchema.js";
 
 export const signup = async (req, res) => {
   const { username, email, password } = req.body;
@@ -71,4 +72,20 @@ export const login = async (req, res) => {
     return;
   }
 };
-export const myCourse = async () => {};
+export const myCourse = async (req, res) => {
+  const userId = req.user.userId
+  try{
+    const purchases = await Purchases.find({
+      userId : userId
+    })
+    const courseIds = purchases.map(p=>p.courseId)
+    res.json({
+      courseIds
+    })
+  }catch(error){
+    res.json({
+      message: "error finding courses"
+    })
+    console.log("error fetching courses from db" , error)
+  }
+};
