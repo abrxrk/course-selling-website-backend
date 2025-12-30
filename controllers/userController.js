@@ -45,7 +45,7 @@ export const login = async (req, res) => {
       res.json({
         message: "user not found..",
       });
-      return
+      return;
     }
     const comparePassword = await bcrypt.compare(password, user.password);
     if (!comparePassword) {
@@ -73,19 +73,16 @@ export const login = async (req, res) => {
   }
 };
 export const myCourse = async (req, res) => {
-  const userId = req.user.userId
-  try{
-    const purchases = await Purchases.find({
-      userId : userId
-    })
-    const courseIds = purchases.map(p=>p.courseId)
+  const userId = req.user.userId;
+  try {
+    const purchases = await Purchases.find({ userId }).populate("courseId");
     res.json({
-      courseIds
-    })
-  }catch(error){
+      purchases,
+    });
+  } catch (error) {
     res.json({
-      message: "error finding courses"
-    })
-    console.log("error fetching courses from db" , error)
+      message: "error finding courses",
+    });
+    console.log("error fetching courses from db", error);
   }
 };
