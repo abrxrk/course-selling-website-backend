@@ -5,7 +5,7 @@ const CourseSchema = new Schema({
   description: String,
   imageUrl: String,
   price: Number,
-  adminId: objectId,
+  adminId: { type: objectId, ref: "Admin" },
 });
 
 export const Courses = mongoose.model("Courses", CourseSchema);

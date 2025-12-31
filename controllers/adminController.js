@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { Admin } from "../models/AdminSchema.js";
+import { Courses } from "../models/CourseSchema.js";
 
 export const signup = async (req, res) => {
   const { username, email, password } = req.body;
@@ -44,7 +45,7 @@ export const login = async (req, res) => {
       res.json({
         message: "user not found..",
       });
-      return
+      return;
     }
     const comparePassword = await bcrypt.compare(password, user.password);
     if (!comparePassword) {
@@ -71,6 +72,78 @@ export const login = async (req, res) => {
     return;
   }
 };
-export const addCourse = async () => {};
-export const updateCourse = async () => {};
-export const removeCourse = async () => {};
+export const addCourse = async (req, res) => {
+  const { title, description, imageUrl, price } = req.body;
+  const adminId = req.user.adminId;
+  if (!title || !description || !imageUrl || !price || !adminId) {
+    res.json({ message: "course creation credentials missing" });
+    return;
+  }
+  const adminFound = await Admin.findById({
+    _id: adminId,
+  });
+  if (!adminFound) {
+    res.json({
+      message: "admin not found",
+    });
+    return;
+  }
+  try {
+    await Courses.create({
+      title,
+      description,
+      imageUrl,
+      price,
+      adminId,
+    });
+    res.json({
+      message: "course created successfully",
+    });
+  } catch (error) {
+    res.json({
+      message: "error creating a course",
+    });
+    console.log("error creating a course", error);
+  }
+};
+export const updateCourse = async (req, res) => {
+  const { title, description, imageUrl, price, courseId } = req.body;
+  const adminId = req.user.adminId;
+  const courseVerify = await Courses.findOne({
+    _id: courseId,
+    adminId: adminId,
+  });
+  if (!courseVerify) {
+    return res.json({ message: "this course doesnt belong to this admin" });
+  }
+  try {
+    await Courses.findByIdAndUpdate(courseId, {
+      title: title,
+      description: description,
+      imageUrl: imageUrl,
+      price: price,
+    });
+    res.json({ message: "successfully updated course" });
+  } catch (err) {
+    res.json({ message: "error updating course" });
+    console.log("error updating course", err);
+  }
+};
+export const removeCourse = async (req, res) => {
+  const { courseId } = req.body;
+  const adminId = req.user.adminId;
+  const courseVerify = await Courses.findOne({
+    _id: courseId,
+    adminId: adminId,
+  });
+  if (!courseVerify) {
+    return res.json({ message: "this course doesnt belong to this admin" });
+  }
+  try {
+    await Courses.findByIdAndDelete(courseId);
+    res.json({ message: "successfully updated course" });
+  } catch (err) {
+    res.json({ message: "error deleting course" });
+    console.log("error deleting course", err);
+  }
+};
